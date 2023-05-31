@@ -52,7 +52,7 @@ const FunctionList = () => {
     setNewFunction(initialFunction)
     console.log(newFunction)
   }
-
+//comment
   return (
     <div>
       <h2 className="page-header">functions</h2>
