@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 
 import { Link } from 'react-router-dom'
 
@@ -16,11 +16,11 @@ import statusCards from '../assets/JsonData/status-card-data.json'
 
 const chartOptions = {
     series: [{
-        name: 'Online Customers',
-        data: [40,70,20,90,36,80,30,91,60]
+        name: 'Public Cloud Fn',
+        data: [10, 24, 38, 49, 57, 70, 78, 83, 88, 99]
     }, {
-        name: 'Store Customers',
-        data: [40, 30, 70, 80, 40, 16, 40, 20, 51, 10]
+        name: 'Private Cloud Fn',
+        data: [3, 5, 8, 13, 21, 34, 55, 66, 69, 71]
     }],
     options: {
         color: ['#6ab04c', '#2980b9'],
@@ -34,7 +34,7 @@ const chartOptions = {
             curve: 'smooth'
         },
         xaxis: {
-            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep']
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'May', 'Jul', 'Aug', 'Sep', 'Oct']
         },
         legend: {
             position: 'top'
@@ -48,34 +48,34 @@ const chartOptions = {
 const topCustomers = {
     head: [
         'user',
-        'total orders',
-        'total spending'
+        'total functions',
+        'total saved'
     ],
     body: [
         {
-            "username": "john doe",
-            "order": "490",
-            "price": "$15,870"
+            "username": "Dilax",
+            "function": "490",
+            "saved": "$870"
         },
         {
-            "username": "frank iva",
-            "order": "250",
-            "price": "$12,251"
+            "username": "Baby",
+            "function": "250",
+            "saved": "$251"
         },
         {
-            "username": "anthony baker",
-            "order": "120",
-            "price": "$10,840"
+            "username": "Diana",
+            "function": "120",
+            "saved": "$840"
         },
         {
-            "username": "frank iva",
-            "order": "110",
-            "price": "$9,251"
+            "username": "Prathees",
+            "function": "110",
+            "saved": "$251"
         },
         {
-            "username": "anthony baker",
-            "order": "80",
-            "price": "$8,840"
+            "username": "Diana",
+            "function": "80",
+            "saved": "$140"
         }
     ]
 }
@@ -87,63 +87,62 @@ const renderCusomerHead = (item, index) => (
 const renderCusomerBody = (item, index) => (
     <tr key={index}>
         <td>{item.username}</td>
-        <td>{item.order}</td>
-        <td>{item.price}</td>
+        <td>{item.function}</td>
+        <td>{item.saved}</td>
     </tr>
 )
 
 const latestOrders = {
     header: [
-        "order id",
+        "function id",
         "user",
-        "total price",
+        "total saved",
         "date",
         "status"
     ],
     body: [
         {
             id: "#OD1711",
-            user: "john doe",
-            date: "17 Jun 2021",
-            price: "$900",
-            status: "shipping"
+            user: "Dilax",
+            date: "17 May 2023",
+            saved: "$96",
+            status: "Hold"
         },
         {
             id: "#OD1712",
-            user: "frank iva",
-            date: "1 Jun 2021",
-            price: "$400",
-            status: "paid"
+            user: "Pirathees K",
+            date: "1 May 2023",
+            saved: "$45",
+            status: "Deployed"
         },
         {
             id: "#OD1713",
-            user: "anthony baker",
-            date: "27 Jun 2021",
-            price: "$200",
-            status: "pending"
+            user: "Prathees P",
+            date: "27 May 2023",
+            saved: "$27",
+            status: "Pending"
         },
         {
             id: "#OD1712",
-            user: "frank iva",
-            date: "1 Jun 2021",
-            price: "$400",
-            status: "paid"
+            user: "Pirathees K",
+            date: "8 May 2023",
+            saved: "$38",
+            status: "Deployed"
         },
         {
             id: "#OD1713",
-            user: "anthony baker",
-            date: "27 Jun 2021",
-            price: "$200",
-            status: "refund"
+            user: "Prathees P",
+            date: "23 May 2023",
+            saved: "$74",
+            status: "Deployed"
         }
     ]
 }
 
-const orderStatus = {
-    "shipping": "primary",
-    "pending": "warning",
-    "paid": "success",
-    "refund": "danger"
+const functionStatus = {
+    "Hold": "primary",
+    "Pending": "warning",
+    "Deployed": "success",
 }
 
 const renderOrderHead = (item, index) => (
@@ -154,10 +153,10 @@ const renderOrderBody = (item, index) => (
     <tr key={index}>
         <td>{item.id}</td>
         <td>{item.user}</td>
-        <td>{item.price}</td>
+        <td>{item.saved}</td>
         <td>{item.date}</td>
         <td>
-            <Badge type={orderStatus[item.status]} content={item.status}/>
+            <Badge type={functionStatus[item.status]} content={item.status} />
         </td>
     </tr>
 )
@@ -191,10 +190,10 @@ const Dashboard = () => {
                         <Chart
                             options={themeReducer === 'theme-mode-dark' ? {
                                 ...chartOptions.options,
-                                theme: { mode: 'dark'}
+                                theme: { mode: 'dark' }
                             } : {
                                 ...chartOptions.options,
-                                theme: { mode: 'light'}
+                                theme: { mode: 'light' }
                             }}
                             series={chartOptions.series}
                             type='line'
@@ -202,7 +201,7 @@ const Dashboard = () => {
                         />
                     </div>
                 </div>
-                <div className="col-4">
+                <div className="col-5">
                     <div className="card">
                         <div className="card__header">
                             <h3>top customers</h3>
@@ -220,10 +219,10 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-8">
+                <div className="col-7">
                     <div className="card">
                         <div className="card__header">
-                            <h3>latest orders</h3>
+                            <h3>latest functions</h3>
                         </div>
                         <div className="card__body">
                             <Table

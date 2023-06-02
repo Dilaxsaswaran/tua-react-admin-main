@@ -133,7 +133,7 @@ const ThemeMenu = () => {
                         }
                     </ul>
                 </div>
-                <div className="theme-menu__select">
+                {/* <div className="theme-menu__select">
                     <span>Choose color</span>
                     <ul className="mode-list">
                         {
@@ -147,7 +147,7 @@ const ThemeMenu = () => {
                             ))
                         }
                     </ul>
-                </div>
+                </div> */}
             </div>
         </div>
     )

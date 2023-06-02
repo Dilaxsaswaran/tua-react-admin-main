@@ -28,7 +28,7 @@ const renderBody = (item, index) => (
     </tr>
 )
 
-const Customers = () => {
+const RecentWorks = () => {
     return (
         <div>
             <h2 className="page-header">
@@ -53,4 +53,4 @@ const Customers = () => {
     )
 }
 
-export default Customers
+export default RecentWorks

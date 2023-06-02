@@ -19,7 +19,7 @@ const store = createStore(
   rootReducer
 )
 
-document.title = 'Tua CRM'
+document.title = 'C-Opt'
 
 ReactDOM.render(
   <Provider store={store}>

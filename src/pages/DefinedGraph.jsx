@@ -1,8 +1,46 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
 const DefinedGraph = () => {
 	const svgRef = useRef(null);
+	const [allNodes, setAllNodes] = useState([
+		{ id: 'A', x: 100, y: 100 },
+		{ id: 'B', x: 200, y: 200 },
+		{ id: 'C', x: 300, y: 300 },
+	]);
+	const [allLinks, setAllLinks] = useState([
+		{ source: 'A', target: 'B', weight: 1 },
+		{ source: 'B', target: 'C', weight: 0.7 },
+		{ source: 'C', target: 'C', weight: 0.2 },
+	]);
+	const [labels, setLabels] = useState([]);
+
+	const addNode = () => {
+		const newNodeId = prompt('Enter the ID of the new node:');
+		if (newNodeId) {
+			const newNode = { id: newNodeId, x: 500, y: 200 };
+			setAllNodes([...allNodes, newNode]);
+		}
+	};
+
+	const addLink = () => {
+		const sourceNode = prompt('Enter the ID of the source node:');
+		const targetNode = prompt('Enter the ID of the target node:');
+		const weight = prompt('Enter the weight of the link:');
+		if (sourceNode && targetNode && weight) {
+			const newLink = { source: sourceNode, target: targetNode, weight: parseFloat(weight) };
+			setAllLinks([...allLinks, newLink]);
+		}
+	};
+
+	// const addLabel = () => {
+	// 	const nodeId = prompt('Enter the ID of the node to label:');
+	// 	const label = prompt('Enter the label for the node:');
+	// 	if (nodeId && label) {
+	// 		const newLabel = { nodeId, label };
+	// 		setLabels([...labels, newLabel]);
+	// 	}
+	// };
 
 	useEffect(() => {
 		const width = 800;
@@ -12,33 +50,21 @@ const DefinedGraph = () => {
 			.attr('width', width)
 			.attr('height', height);
 
-		const nodes = [
-			{ id: 'A', x: 100, y: 100 },
-			{ id: 'B', x: 200, y: 200 },
-			{ id: 'C', x: 300, y: 300 },
-			{ id: 'D', x: 400, y: 200 },
-			{ id: 'E', x: 500, y: 100 },
-		];
+		const nodes = allNodes
 
-		const links = [
-			{ source: 'A', target: 'B', weight: 1 },
-			{ source: 'B', target: 'C', weight: 0.7 },
-			{ source: 'C', target: 'D', weight: 1 },
-			{ source: 'D', target: 'E', weight: 1 },
-			{ source: 'E', target: 'A', weight: 0.8 },
-			{ source: 'C', target: 'C', weight: 0.2 },
-		];
+		const links = allLinks
 
 		const link = svg.append('g')
 			.selectAll('line')
-			.data(links)
+			.data(links.filter((link) => link.source !== link.target))
 			.enter()
 			.append('line')
 			.attr('marker-end', 'url(#arrowhead)')
 			.style('stroke', '#333')
 			.style('stroke-width', 4);
 
-		const selfLoop = svg.append('g')
+		const selfLoop = svg
+			.append('g')
 			.selectAll('path')
 			.data(links.filter((link) => link.source === link.target))
 			.enter()
@@ -46,13 +72,50 @@ const DefinedGraph = () => {
 			.attr('d', (d) => {
 				const x = 0;
 				const y = 0;
-				const radius = 50;
-				const lineLength = 15;
-				return `M${x - radius},${y}A${radius},${radius} 0 1,0 ${x + radius},${y}M${x - radius - 2},${y}H${y + lineLength}M${x + radius + 2},${y}H${y + lineLength}`;
+				const radiusX = 15; // X-axis radius
+				const radiusY = 50; // Y-axis radius
+				return `M${x - radiusX},${y}A${radiusX},${radiusY} 0 1,0 ${x + radiusX},${y}`;
 			})
 			.style('fill', 'none')
 			.style('stroke', '#333')
-			.style('stroke-width', 4);
+			.style('stroke-width', 4)
+			.attr('marker-end', 'url(#arrowhead-self-loop)');
+
+		// Append the arrowhead marker to the defs section
+		svg
+  .append('defs')
+  .append('marker')
+  .attr('id', 'arrowhead-self-loop')
+  .attr('viewBox', '-10 -10 25 25')
+  .attr('refX', 36)
+  .attr('refY', 28)
+  .attr('markerWidth', 8)
+  .attr('markerHeight', 6)
+  .attr('orient', 'auto')
+  .append('path')
+  .attr('d', 'M-10,-6 L0,0 L-10,6')
+  .attr('fill', '#333')
+  .attr('transform', 'rotate(-30)');
+
+
+
+
+		const selfLoopText = svg.append('g')
+			.selectAll('text')
+			.data(links.filter((link) => link.source === link.target))
+			.enter()
+			.append('text')
+			.attr('x', (d) => getNodePosition(d.source).x)
+			.attr('y', (d) => getNodePosition(d.source).y + 65)
+			.attr('text-anchor', 'middle')
+			.style('fill', '#000000')
+			.style('font-size', '14px')
+			.style('stroke', 'white')
+			.style('stroke-width', '0.5px')
+			.style('font-weight', 'bold') // Add font-weight
+			.style('font-weight', '900')
+			.text((d) => d.weight)
+			.on('dblclick', handleLinkTextDoubleClick);
 
 		const node = svg.append('g')
 			.selectAll('circle')
@@ -82,9 +145,10 @@ const DefinedGraph = () => {
 				.on('drag', dragged)
 				.on('end', dragEnded));
 
-		const linkText = svg.append('g')
+		const linkText = svg
+			.append('g')
 			.selectAll('text')
-			.data(links)
+			.data(links.filter((d) => getNodePosition(d.source).x !== getNodePosition(d.target).x))
 			.enter()
 			.append('text')
 			.attr('text-anchor', 'middle')
@@ -92,7 +156,11 @@ const DefinedGraph = () => {
 			.attr('x', (d) => (getNodePosition(d.source).x + getNodePosition(d.target).x) / 2)
 			.attr('y', (d) => (getNodePosition(d.source).y + getNodePosition(d.target).y) / 2 - 7)
 			.style('fill', '#000000')
-			.style('font-size', '16px')
+			.style('font-size', '14px')
+			.style('stroke', 'white')
+			.style('stroke-width', '0.5px')
+			.style('font-weight', 'bold') // Add font-weight
+			.style('font-weight', '900')
 			.on('dblclick', handleLinkTextDoubleClick);
 
 		link
@@ -142,8 +210,13 @@ const DefinedGraph = () => {
 
 		function updateLinkTexts() {
 			linkText
+				.filter((d) => getNodePosition(d.source).x !== getNodePosition(d.target).x)
 				.attr('x', (d) => (getNodePosition(d.source).x + getNodePosition(d.target).x) / 2)
 				.attr('y', (d) => (getNodePosition(d.source).y + getNodePosition(d.target).y) / 2 - 7);
+
+			selfLoopText
+				.attr('x', (d) => getNodePosition(d.source).x)
+				.attr('y', (d) => getNodePosition(d.source).y + 65);
 		}
 
 		function updateSelfLoops() {
@@ -212,9 +285,21 @@ const DefinedGraph = () => {
 		return () => {
 			svg.selectAll('*').remove();
 		};
-	}, []);
+	}, [allNodes, allLinks]);
 
-	return <svg ref={svgRef}></svg>;
+	return (
+		<div>
+			<div>
+				<button onClick={addLink} style={{ backgroundColor: '#349eff', color: '#ffffff', marginRight: '10px', padding: '3px' }}>Add Link</button>
+				<button onClick={addNode} style={{ backgroundColor: '#349eff', color: '#ffffff', marginRight: '10px', padding: '3px' }}>Add Node</button>
+			</div>
+			<div>
+				<svg ref={svgRef}></svg>
+			</div>
+
+			{/* <button onClick={addLabel}>Add Label</button> */}
+		</div>
+	);
 };
 
 export default DefinedGraph;
