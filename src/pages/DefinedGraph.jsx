@@ -1,19 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import { useParams } from 'react-router-dom';
 
-const DefinedGraph = () => {
+const DefinedGraph = ({ nodes, links, pageFrom }) => {
+	console.log(nodes, links)
 	const svgRef = useRef(null);
-	const [allNodes, setAllNodes] = useState([
-		{ id: 'A', x: 100, y: 100 },
-		{ id: 'B', x: 200, y: 200 },
-		{ id: 'C', x: 300, y: 300 },
-	]);
-	const [allLinks, setAllLinks] = useState([
-		{ source: 'A', target: 'B', weight: 1 },
-		{ source: 'B', target: 'C', weight: 0.7 },
-		{ source: 'C', target: 'C', weight: 0.2 },
-	]);
 	const [labels, setLabels] = useState([]);
+	const [allNodes, setAllNodes] = useState(nodes);
+	const [allLinks, setAllLinks] = useState(links);
 
 	const addNode = () => {
 		const newNodeId = prompt('Enter the ID of the new node:');
@@ -83,19 +77,19 @@ const DefinedGraph = () => {
 
 		// Append the arrowhead marker to the defs section
 		svg
-  .append('defs')
-  .append('marker')
-  .attr('id', 'arrowhead-self-loop')
-  .attr('viewBox', '-10 -10 25 25')
-  .attr('refX', 36)
-  .attr('refY', 28)
-  .attr('markerWidth', 8)
-  .attr('markerHeight', 6)
-  .attr('orient', 'auto')
-  .append('path')
-  .attr('d', 'M-10,-6 L0,0 L-10,6')
-  .attr('fill', '#333')
-  .attr('transform', 'rotate(-30)');
+			.append('defs')
+			.append('marker')
+			.attr('id', 'arrowhead-self-loop')
+			.attr('viewBox', '-10 -10 25 25')
+			.attr('refX', 36)
+			.attr('refY', 28)
+			.attr('markerWidth', 8)
+			.attr('markerHeight', 6)
+			.attr('orient', 'auto')
+			.append('path')
+			.attr('d', 'M-10,-6 L0,0 L-10,6')
+			.attr('fill', '#333')
+			.attr('transform', 'rotate(-30)');
 
 
 
@@ -289,10 +283,36 @@ const DefinedGraph = () => {
 
 	return (
 		<div>
-			<div>
-				<button onClick={addLink} style={{ backgroundColor: '#349eff', color: '#ffffff', marginRight: '10px', padding: '3px' }}>Add Link</button>
-				<button onClick={addNode} style={{ backgroundColor: '#349eff', color: '#ffffff', marginRight: '10px', padding: '3px' }}>Add Node</button>
-			</div>
+			{pageFrom === 'appPage' ? null : (
+				<div>
+					<button onClick={addLink}
+						style={{
+							backgroundColor: '#349eff',
+							color: '#ffffff',
+							marginRight: '10px',
+							padding: '8px 16px',
+							border: 'none',
+							borderRadius: '4px',
+							fontSize: '16px',
+							cursor: 'pointer',
+							boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+						}}
+					>Add Link</button>
+					<button onClick={addNode}
+						style={{
+							backgroundColor: '#349eff',
+							color: '#ffffff',
+							marginRight: '10px',
+							padding: '8px 16px',
+							border: 'none',
+							borderRadius: '4px',
+							fontSize: '16px',
+							cursor: 'pointer',
+							boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+						}}
+					>Add Node</button>
+				</div>
+			)}
 			<div>
 				<svg ref={svgRef}></svg>
 			</div>
