@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './sidebar.css';
 import logo from '../../assets/images/logo.png';
 import sidebar_items from '../../assets/JsonData/sidebar_routes.json';
@@ -17,15 +17,15 @@ const SidebarItem = (props) => {
   );
 };
 
-const Sidebar = (props) => {
-  const activeItem = sidebar_items.findIndex(
-    (item) => item.route === props.location.pathname
-  );
+const Sidebar = () => {
+  const location = useLocation();
+
+  const activeItem = sidebar_items.findIndex((item) => item.route === location.pathname);
 
   return (
     <div className="sidebar">
       <div className="sidebar__logo">
-        <img src={logo} alt="company logo" style={{ width: '170px', height: '60px', alignContent:'flex-start', alignItems: 'flex-start' }} />
+        <img src={logo} alt="company logo" style={{ width: '170px', height: '60px', alignContent: 'flex-start', alignItems: 'flex-start' }} />
       </div>
       {sidebar_items.map((item, index) => (
         <Link to={item.route} key={index}>

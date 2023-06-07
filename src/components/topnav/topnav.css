@@ -1,8 +1,9 @@
 .topnav {
+    align-self: flex-end;
     padding: 30px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     height: var(--topnav-height);
 }
 

@@ -10,8 +10,8 @@
         "icon": "bx bx-clipboard"
     },
     {
-        "display_name": "Functions",
-        "route": "/functions",
+        "display_name": "New App",
+        "route": "/create_app",
         "icon": "bx bx-code-curly"
     },
     {
@@ -21,12 +21,12 @@
     },
     {
         "display_name": "Features",
-        "route": "/categories",
+        "route": "/dashboard",
         "icon": "bx bx-list-ol"
     },
     {
         "display_name": "About Us",
-        "route": "/discount",
+        "route": "/aboutus",
         "icon": "bx bx-group"
     }
 ]

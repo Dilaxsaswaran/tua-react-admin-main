@@ -19,7 +19,7 @@ const store = createStore(
   rootReducer
 )
 
-document.title = 'C-Opt'
+document.title = 'Clouders'
 
 ReactDOM.render(
   <Provider store={store}>

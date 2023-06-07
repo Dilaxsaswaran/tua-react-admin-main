@@ -1,32 +1,78 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { useParams } from 'react-router-dom';
+import Modal from 'react-modal';
 
-const DefinedGraph = ({ nodes, links, pageFrom }) => {
-	console.log(nodes, links)
+const EditableGraph = ({ location }) => {
+	// console.log(location.state['functionList']);
+
+	const fnList = Array.isArray(location.state['functionList']) ? (location.state['functionList']) : [];
+
+	const nodes = fnList.map((fn, index) => ({
+		id: fn.shortName,
+		x: (index * 100) + 100,
+		y: Math.floor(Math.random() * 3 + 1) * 100
+	}));
+
+	// console.log(nodes)
+
 	const svgRef = useRef(null);
-	const [labels, setLabels] = useState([]);
 	const [allNodes, setAllNodes] = useState(nodes);
-	const [allLinks, setAllLinks] = useState(links);
+	const [allLinks, setAllLinks] = useState([]);
 
-	const addNode = () => {
-		const newNodeId = prompt('Enter the ID of the new node:');
-		if (newNodeId) {
-			const newNode = { id: newNodeId, x: 500, y: 200 };
-			setAllNodes([...allNodes, newNode]);
+	// const addNode = () => {
+	// 	const newNodeId = prompt('Enter the ID of the new node:');
+	// 	if (newNodeId) {
+	// 		const newNode = { id: newNodeId, x: 500, y: 200 };
+	// 		setAllNodes([...allNodes, newNode]);
+	// 	}
+	// };
+
+
+	const [modalOpen, setModalOpen] = useState(false);
+	const [sourceNode, setSourceNode] = useState('');
+	const [targetNode, setTargetNode] = useState('');
+	const [linkWeight, setLinkWeight] = useState(0);
+	const [customLinkWeight, setCustomLinkWeight] = useState('');
+
+	const openModal = () => {
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
+
+	const handleSourceNodeChange = (event) => {
+		setSourceNode(event.target.value);
+	};
+
+	const handleTargetNodeChange = (event) => {
+		setTargetNode(event.target.value);
+	};
+
+	const handleLinkWeightChange = (event) => {
+		const selectedWeight = event.target.value;
+		if (selectedWeight === 'custom') {
+			setLinkWeight('custom');
+		} else {
+			setLinkWeight(parseFloat(selectedWeight));
 		}
 	};
 
-	const addLink = () => {
-		const sourceNode = prompt('Enter the ID of the source node:');
-		const targetNode = prompt('Enter the ID of the target node:');
-		const weight = prompt('Enter the weight of the link:');
+	const handleCustomLinkWeightChange = (event) => {
+		setCustomLinkWeight(parseFloat(event.target.value));
+	};
+
+
+	const handleAddLink = () => {
+		closeModal();
+		const weight = linkWeight === 'custom' ? customLinkWeight : linkWeight;
 		if (sourceNode && targetNode && weight) {
-			const newLink = { source: sourceNode, target: targetNode, weight: parseFloat(weight) };
+			const newLink = { source: sourceNode, target: targetNode, weight: weight };
 			setAllLinks([...allLinks, newLink]);
 		}
 	};
-
 	// const addLabel = () => {
 	// 	const nodeId = prompt('Enter the ID of the node to label:');
 	// 	const label = prompt('Enter the label for the node:');
@@ -35,14 +81,17 @@ const DefinedGraph = ({ nodes, links, pageFrom }) => {
 	// 		setLabels([...labels, newLabel]);
 	// 	}
 	// };
+	useEffect(() => {
+		console.log(allLinks)
+	}, [allLinks])
 
 	useEffect(() => {
-		const width = 800;
-		const height = 600;
+		const width = 1300;
+		const height = 700;
 
 		const svg = d3.select(svgRef.current)
-			.attr('width', width)
-			.attr('height', height);
+			.attr('height', height)
+			.attr('width', width);
 
 		const nodes = allNodes
 
@@ -283,43 +332,149 @@ const DefinedGraph = ({ nodes, links, pageFrom }) => {
 
 	return (
 		<div>
-			{pageFrom === 'appPage' ? null : (
-				{/* <div>
-					<button onClick={addLink}
-						style={{
-							backgroundColor: '#349eff',
-							color: '#ffffff',
-							marginRight: '10px',
-							padding: '8px 16px',
-							border: 'none',
-							borderRadius: '4px',
-							fontSize: '16px',
-							cursor: 'pointer',
-							boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-						}}
-					>Add Link</button>
-					<button onClick={addNode}
-						style={{
-							backgroundColor: '#349eff',
-							color: '#ffffff',
-							marginRight: '10px',
-							padding: '8px 16px',
-							border: 'none',
-							borderRadius: '4px',
-							fontSize: '16px',
-							cursor: 'pointer',
-							boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-						}}
-					>Add Node</button>
-				</div> */}
-			)}
+			<p style={instructions}>
+				Please interact with the graph (You can adjust the nodes) element to perform certain actions, and use the "Add Link" button to create new links between nodes.
+			</p>
 			<div>
+				<button onClick={openModal} style={buttonStyle}>
+					Add Link
+				</button>
+			</div>
+
+			{/* Render the rest of the component */}
+
+			<Modal isOpen={modalOpen} onRequestClose={closeModal} style={modalStyle}>
+				<h2 style={{ marginBottom: '20px' }}>Add Link</h2>
+				<div style={{ marginBottom: '20px' }}>
+					<label style={{ marginBottom: '10px' }}>Source Node:</label>
+					<select value={sourceNode} onChange={handleSourceNodeChange} style={selectStyle}>
+						<option value="">Select a source node</option>
+						{allNodes.map((node) => (
+							<option key={node.id} value={node.id}>
+								{node.id}
+							</option>
+						))}
+					</select>
+				</div>
+				<div style={{ marginBottom: '20px' }}>
+					<label style={{ marginBottom: '10px' }}>Target Node:</label>
+					<select value={targetNode} onChange={handleTargetNodeChange} style={selectStyle}>
+						<option value="">Select a target node</option>
+						{allNodes.map((node) => (
+							<option key={node.id} value={node.id}>
+								{node.id}
+							</option>
+						))}
+					</select>
+				</div>
+				<div style={{ marginBottom: '20px' }}>
+					<label style={{ marginBottom: '10px' }}>Link Weight:</label>
+					<select value={linkWeight} onChange={handleLinkWeightChange} style={selectStyle}>
+						<option value="0.25">0.25</option>
+						<option value="0.5">0.5</option>
+						<option value="0.75">0.75</option>
+						<option value="custom">Custom</option>
+					</select>
+					{linkWeight === 'custom' && (
+						<input
+							type="number"
+							value={customLinkWeight}
+							onChange={handleCustomLinkWeightChange}
+							style={{ ...inputStyle, marginTop: '10px' }}
+							placeholder="Enter"
+						/>
+					)}
+				</div>
+
+				<div>
+					<button onClick={handleAddLink} style={buttonStyle}>
+						Add Link
+					</button>
+					<button onClick={closeModal} style={buttonStyle}>
+						Cancel
+					</button>
+				</div>
+			</Modal>
+
+
+			<div
+				style={{
+					overflow: 'auto',
+					backgroundColor: '#eee',
+					width: '100%',
+					height: '100%',
+					marginTop: '10px'
+				}}
+			>
 				<svg ref={svgRef}></svg>
 			</div>
 
-			{/* <button onClick={addLabel}>Add Label</button> */}
 		</div>
 	);
 };
 
-export default DefinedGraph;
+// Button Style
+const buttonStyle = {
+	padding: '10px 20px',
+	margin: '5px',
+	backgroundColor: '#007bff',
+	color: '#fff',
+	border: 'none',
+	borderRadius: '4px',
+	cursor: 'pointer',
+};
+const selectStyle = {
+	width: '150px',
+	padding: '8px',
+	borderRadius: '4px',
+	border: '1px solid #ccc',
+	backgroundColor: '#fff',
+};
+const inputStyle = {
+	width: '30%',
+	padding: '8px',
+	marginLeft: '5px',
+	borderRadius: '4px',
+	border: '1px solid #ccc',
+};
+const instructions = {
+	fontSize: '16px',
+	color: '#555',
+	marginBottom: '20px',
+	marginLeft: '10px',
+	// textAlign: 'center',
+	fontStyle: 'italic',
+	fontWeight: 400,
+	textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+	letterSpacing: '1px'
+}
+// Modal Style
+const modalStyle = {
+	overlay: {
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	content: {
+		position: 'relative',
+		top: 'auto',
+		left: 'auto',
+		right: 'auto',
+		bottom: 'auto',
+		maxWidth: '300px',
+		width: '90%',
+		padding: '30px',
+		border: 'none',
+		borderRadius: '8px',
+		boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+		backgroundColor: '#fff',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		textAlign: 'center',
+	},
+};
+
+
+export default EditableGraph;
